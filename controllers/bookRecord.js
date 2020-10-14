@@ -134,4 +134,62 @@ const delete_by_id = async (req, res) => {
     });
   }
 };
-module.exports = { create, get_book, update_by_id, delete_by_id };
+const add_members = async (req, res) => {
+  try {
+    const params = req.body;
+    const pid = req.params.id;
+    const oldData = await bookRecord.findById(pid);
+    const newData = await bookRecord.findByIdAndUpdate(pid, {
+      members: oldData.members.push(params.user_id),
+    });
+    return res.status(200).send({
+      status: {
+        code: 200,
+        message: "OK",
+      },
+      newData,
+    });
+  } catch (err) {
+    return res.status(400).send({
+      status: {
+        code: 400,
+        message: err.message,
+      },
+    });
+  }
+};
+const kick_members = async (req, res) => {
+  try {
+    const params = req.body;
+    const pid = req.params.id;
+    const oldData = await bookRecord.findById(pid);
+    const index = data.bookRecord.indexOf(params.user_id);
+    if (index > -1) {
+      const newData = await bookRecord.findByIdAndUpdate(pid, {
+        members: oldData.members.splice(index, 1),
+      });
+      return res.status(200).send({
+        status: {
+          code: 200,
+          message: "OK",
+        },
+        newData,
+      });
+    }
+  } catch (err) {
+    return res.status(400).send({
+      status: {
+        code: 400,
+        message: err.message,
+      },
+    });
+  }
+};
+module.exports = {
+  create,
+  get_book,
+  update_by_id,
+  delete_by_id,
+  add_members,
+  kick_members,
+};
