@@ -163,7 +163,7 @@ const kick_members = async (req, res) => {
     const params = req.body;
     const pid = req.params.id;
     const oldData = await bookRecord.findById(pid);
-    const index = data.bookRecord.indexOf(params.user_id);
+    const index = oldData.bookRecord.indexOf(params.user_id);
     if (index > -1) {
       const newData = await bookRecord.findByIdAndUpdate(pid, {
         members: oldData.members.splice(index, 1),
