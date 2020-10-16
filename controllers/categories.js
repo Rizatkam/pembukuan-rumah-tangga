@@ -1,18 +1,20 @@
-const { currency } = require("../models");
+const { categories } = require("../models");
 
-const create = async (req, res) => {
+const adds = async (req, res) => {
   try {
     const params = req.body;
-    const data = await currency.create(params);
+
+    const data = await categories.create(params);
 
     return res.status(201).send({
       status: {
         code: 201,
-        message: "Currency has been inserted!",
+        message: "Category has been inserted!",
       },
       data,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -22,9 +24,9 @@ const create = async (req, res) => {
   }
 };
 
-const get_all = async (req, res) => {
+const gets = async (req, res) => {
   try {
-    const data = await currency.find();
+    const data = await categories.find({ record_id: req.params.id });
 
     if (!data) {
       return res.status(400).send({
@@ -43,6 +45,7 @@ const get_all = async (req, res) => {
       data,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -51,13 +54,16 @@ const get_all = async (req, res) => {
     });
   }
 };
-const update_by_id = async (req, res) => {
+
+const updates = async (req, res) => {
   try {
     const params = req.body;
     const pid = req.params.id;
-    const data = await currency.findByIdAndUpdate(
+
+    await categories.findByIdAndUpdate(
       pid,
       params,
+      { new: true },
       (err, result) => {
         if (err) {
           res.status(400).send({
@@ -72,19 +78,13 @@ const update_by_id = async (req, res) => {
               code: 200,
               message: "OK",
             },
-            result,
+            data: result,
           });
         }
       }
     );
-    return res.status(200).send({
-      status: {
-        code: 200,
-        message: "OK",
-      },
-      data,
-    });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -93,10 +93,12 @@ const update_by_id = async (req, res) => {
     });
   }
 };
-const delete_by_id = async (req, res) => {
+
+const deletes = async (req, res) => {
   try {
     const pid = req.params.id;
-    const data = await currency.findByIdAndDelete(pid, (err) => {
+
+    await categories.findByIdAndDelete(pid, (err) => {
       if (err) {
         res.status(400).send({
           status: {
@@ -113,14 +115,8 @@ const delete_by_id = async (req, res) => {
         });
       }
     });
-    return res.status(200).send({
-      status: {
-        code: 200,
-        message: "OK",
-      },
-      data,
-    });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -129,4 +125,5 @@ const delete_by_id = async (req, res) => {
     });
   }
 };
-module.exports = { create, get_all, update_by_id, delete_by_id };
+
+module.exports = { adds, gets, updates, deletes };

@@ -3,15 +3,16 @@ const app = express.Router();
 
 const { users } = require("../controllers");
 const auth = require("../config/auth");
+const upload = require("../config/upload");
+const storage = require("../config/storage");
 
-app.get("/auth", auth.userAuth, users.tokenAuth);
-app.post("/registerauth", users.registerWithExternalDataThenLogin);
 app.post("/register", users.register);
 app.post("/login", users.login);
+app.post("/login-external", users.loginExternal);
+
+app.get("/auth", auth.userAuth, users.tokenAuth); // for re-auth after reload
 app.get("/logout", auth.userAuth, users.logout);
-app.get("/sync", auth.userAuth, users.get_user_for_contact);
-app.get("/contact", auth.userAuth, users.get_user_for_contact_by_uname);
-app.put("/:id", auth.userAuth, users.edit_user);
-// app.get("/:id", users.get_by_id)
+app.put("/:id", auth.userAuth, upload("avatar"), storage.google, users.update);
+app.get("/:id", auth.userAuth, users.gets_by_id);
 
 module.exports = app;

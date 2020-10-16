@@ -1,14 +1,15 @@
-const { category } = require("../models");
+const { budgets } = require("../models");
 
-const create = async (req, res) => {
+const adds = async (req, res) => {
   try {
     const params = req.body;
-    const data = await category.create(params);
+
+    const data = await budgets.create(params);
 
     return res.status(201).send({
       status: {
         code: 201,
-        message: "Category has been inserted!",
+        message: "budget has been inserted!",
       },
       data,
     });
@@ -22,15 +23,17 @@ const create = async (req, res) => {
   }
 };
 
-const get_all = async (req, res) => {
+const gets = async (req, res) => {
   try {
-    const data = await category.find().populate("ledger_id");
+    const record_id = req.params.rid;
+
+    const data = await budgets.find({ record_id }).populate("categories");
 
     if (!data) {
       return res.status(400).send({
         status: {
           code: 400,
-          message: "Data not found!",
+          message: "data not found!",
         },
       });
     }
@@ -51,32 +54,20 @@ const get_all = async (req, res) => {
     });
   }
 };
-const update_by_id = async (req, res) => {
+
+const gets_by_id = async (req, res) => {
   try {
-    const params = req.body;
-    const pid = req.params.id;
-    const data = await category.findByIdAndUpdate(
-      pid,
-      params,
-      (err, result) => {
-        if (err) {
-          res.status(400).send({
-            status: {
-              code: 400,
-              message: err.message,
-            },
-          });
-        } else {
-          res.status(200).send({
-            status: {
-              code: 200,
-              message: "OK",
-            },
-            result,
-          });
-        }
-      }
-    );
+    const data = await budgets.findOne({ _id: req.params.id });
+
+    if (!data) {
+      return res.status(400).send({
+        status: {
+          code: 400,
+          message: "data not found!",
+        },
+      });
+    }
+
     return res.status(200).send({
       status: {
         code: 200,
@@ -93,10 +84,50 @@ const update_by_id = async (req, res) => {
     });
   }
 };
-const delete_by_id = async (req, res) => {
+
+const updates = async (req, res) => {
+  try {
+    const params = req.body;
+    const pid = req.params.id;
+
+    await budgets.findByIdAndUpdate(
+      pid,
+      params,
+      { new: true },
+      (err, result) => {
+        if (err) {
+          res.status(400).send({
+            status: {
+              code: 400,
+              message: err.message,
+            },
+          });
+        } else {
+          res.status(200).send({
+            status: {
+              code: 200,
+              message: "OK",
+            },
+            data: result,
+          });
+        }
+      }
+    );
+  } catch (err) {
+    return res.status(400).send({
+      status: {
+        code: 400,
+        message: err.message,
+      },
+    });
+  }
+};
+
+const deletes = async (req, res) => {
   try {
     const pid = req.params.id;
-    const data = await category.findByIdAndDelete(pid, (err) => {
+
+    await budgets.findByIdAndDelete(pid, (err) => {
       if (err) {
         res.status(400).send({
           status: {
@@ -113,13 +144,6 @@ const delete_by_id = async (req, res) => {
         });
       }
     });
-    return res.status(200).send({
-      status: {
-        code: 200,
-        message: "OK",
-      },
-      data,
-    });
   } catch (err) {
     return res.status(400).send({
       status: {
@@ -129,4 +153,4 @@ const delete_by_id = async (req, res) => {
     });
   }
 };
-module.exports = { create, get_all, update_by_id, delete_by_id };
+module.exports = { adds, gets, gets_by_id, updates, deletes };

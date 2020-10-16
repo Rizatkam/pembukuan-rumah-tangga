@@ -7,9 +7,6 @@ const userSchema = new Mongoose.Schema(
       required: true,
       trim: true,
     },
-    dateOfBirth: {
-      type: Date,
-    },
     email: {
       type: String,
       required: true,
@@ -29,6 +26,17 @@ const userSchema = new Mongoose.Schema(
       minlength: 6,
       trim: true,
     },
+    dateOfBirth: {
+      type: Date,
+    },
+    googleAccount: {
+      type: Object,
+      required: true,
+    },
+    facebookAccount: {
+      type: Object,
+      required: true,
+    },
     avatar: {
       type: String,
     },
@@ -36,18 +44,12 @@ const userSchema = new Mongoose.Schema(
       type: String,
       required: true,
     },
-    facebook: {
-      type: String,
-    },
-    gmail: {
-      type: String,
-    },
   },
   {
     timestamps: true,
   }
 );
 
-const User = Mongoose.model("users", userSchema);
+const User = Mongoose.model("User", userSchema);
 
 module.exports = User;

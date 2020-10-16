@@ -2,21 +2,27 @@ const Mongoose = require("mongoose");
 
 const budgetSchema = new Mongoose.Schema(
   {
-    book_id: {
+    record_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "bookrecord",
+      ref: "records",
     },
     category_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "category",
+      ref: "categories",
+    },
+    subcategory_id: {
+      type: String,
+      trim: true,
     },
     amount: {
       type: Number,
       required: true,
+      trim: true,
+    },
+    note: {
+      type: String,
       trim: true,
     },
     from: {
@@ -35,6 +41,6 @@ const budgetSchema = new Mongoose.Schema(
   }
 );
 
-const Budget = Mongoose.model("budget", budgetSchema);
+const Budget = Mongoose.model("Budget", budgetSchema);
 
 module.exports = Budget;

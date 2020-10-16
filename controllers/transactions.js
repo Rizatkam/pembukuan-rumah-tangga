@@ -1,17 +1,19 @@
-const { transaction, balance, storage } = require("../models");
+const { transactions, balance, categories } = require("../models");
 
-const create = async (req, res) => {
+const adds = async (req, res) => {
   try {
     const params = req.body;
+
     const duplicatebalance = await balance.findOne({
-      book_id: params.bid,
-      wallet_id: params.wid,
+      record_id: params.record_id,
+      wallet_id: params.wallet_id,
     });
+
     if (!duplicatebalance) {
-      const duplicated = await transaction.findOne({
-        book_id: params.bid,
-        wallet_id: params.wid,
-        category_id: params.cid,
+      const duplicated = await transactions.findOne({
+        record_id: params.record_id,
+        wallet_id: params.wallet_id,
+        category_id: params.category_id,
         date: params.date,
       });
 
@@ -24,12 +26,15 @@ const create = async (req, res) => {
           },
         });
       }
-      const data = await transaction.create(params);
+
+      const data = await transactions.create(params);
+
       const dataBalance = await balance.create({
-        book_id: params.bid,
-        wallet_id: params.wid,
+        record_id: params.record_id,
+        wallet_id: params.wallet_id,
         balance: params.amount,
       });
+
       return res.status(201).send({
         status: {
           code: 201,
@@ -39,10 +44,10 @@ const create = async (req, res) => {
         dataBalance,
       });
     } else {
-      const duplicated = await transaction.findOne({
-        book_id: params.bid,
-        wallet_id: params.wid,
-        category_id: params.cid,
+      const duplicated = await transactions.findOne({
+        record_id: params.record_id,
+        wallet_id: params.wallet_id,
+        category_id: params.category_id,
         date: params.date,
       });
 
@@ -55,14 +60,25 @@ const create = async (req, res) => {
           },
         });
       }
-      const data = await transaction.create(params);
+
+      const dataCategory = await categories.findOne({
+        _id: params.category_id,
+      });
+
+      if (dataCategory.type === "expense") {
+        params.amount = -req.body.amount;
+      }
+
+      const data = await transactions.create(params);
+
       const dataBalance = await balance.findOneAndUpdate(
         {
-          book_id: params.bid,
-          wallet_id: params.wid,
+          record_id: params.record_id,
+          wallet_id: params.wallet_id,
         },
         { balance: duplicatebalance.balance + params.amount }
       );
+
       return res.status(201).send({
         status: {
           code: 201,
@@ -73,6 +89,7 @@ const create = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -81,19 +98,21 @@ const create = async (req, res) => {
     });
   }
 };
-const get_by_date = async (req, res) => {
+
+const gets_by_date = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const params = req.query;
-    const book_id = req.params.bid;
-    const data = await transaction
+    const record_id = req.params.bid;
+
+    const data = await transactions
       .find({
-        book_id,
+        record_id,
         date: { $gte: params.from, $lte: params.to },
       })
-      .populate("book_id")
-      .populate("wallet_id")
-      .populate("category_id")
+      .populate("records")
+      .populate("wallets")
+      .populate("categories")
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .sort({ date: -1 })
@@ -116,6 +135,7 @@ const get_by_date = async (req, res) => {
       data,
     });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -124,13 +144,16 @@ const get_by_date = async (req, res) => {
     });
   }
 };
-const update_by_id = async (req, res) => {
+
+const updates = async (req, res) => {
   try {
     const params = req.body;
     const pid = req.params.id;
-    const data = await transaction.findByIdAndUpdate(
+
+    await transactions.findByIdAndUpdate(
       pid,
       params,
+      { new: true },
       (err, result) => {
         if (err) {
           res.status(400).send({
@@ -145,19 +168,13 @@ const update_by_id = async (req, res) => {
               code: 200,
               message: "OK",
             },
-            result,
+            data: result,
           });
         }
       }
     );
-    return res.status(200).send({
-      status: {
-        code: 200,
-        message: "OK",
-      },
-      data,
-    });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -166,10 +183,12 @@ const update_by_id = async (req, res) => {
     });
   }
 };
-const delete_by_id = async (req, res) => {
+
+const deletes = async (req, res) => {
   try {
     const pid = req.params.id;
-    const data = await transaction.findByIdAndDelete(pid, (err) => {
+
+    await transactions.findByIdAndDelete(pid, (err) => {
       if (err) {
         res.status(400).send({
           status: {
@@ -186,14 +205,8 @@ const delete_by_id = async (req, res) => {
         });
       }
     });
-    return res.status(200).send({
-      status: {
-        code: 200,
-        message: "OK",
-      },
-      data,
-    });
   } catch (err) {
+    console.log(err);
     return res.status(400).send({
       status: {
         code: 400,
@@ -202,4 +215,5 @@ const delete_by_id = async (req, res) => {
     });
   }
 };
-module.exports = { create, get_by_date, update_by_id, delete_by_id };
+
+module.exports = { adds, gets_by_date, updates, deletes };

@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const routes = require("./routes");
 const dotenv = require("dotenv");
 const mongoDB = require("./config/mongoose");
+const auth = require("./config/auth");
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -20,7 +21,7 @@ let whitelist = [
   "http://localhost",
   "http://localhost:3000",
   "http://localhost:3001",
-  "http://192.121.99.11:3000",
+  "https://perfirec.netlify.app",
 ];
 let corsOpt = {
   origin: function (origin, callback) {
@@ -38,21 +39,20 @@ let corsOpt = {
 app.use(cors(corsOpt));
 mongoDB();
 
-app.get("/", (req, res) => {
+app.get("/", auth.accessAuth, (req, res) => {
   res.status(200).send({
     message: "Server runing...",
   });
 });
 
-app.use("/api/v1/users", routes.users);
-app.use("/api/v1/transaction", routes.transaction);
-app.use("/api/v1/category", routes.category);
-app.use("/api/v1/bookRecord", routes.bookRecord);
-app.use("/api/v1/wallet", routes.wallet);
-app.use("/api/v1/balance", routes.balance);
-app.use("/api/v1/budget", routes.budget);
-app.use("/api/v1/categoryType", routes.categoryType);
-app.use("/api/v1/parrentCategory", routes.parrentCategory);
-app.use("/api/v1/currency", routes.currency);
+app.use("/api/origin", routes.clients); // create access key for origin
+app.use("/api/v1/users", auth.accessAuth, routes.users);
+app.use("/api/v1/currencies", auth.accessAuth, routes.currencies);
+app.use("/api/v1/records", auth.accessAuth, routes.records);
+app.use("/api/v1/balance", auth.accessAuth, routes.balance);
+app.use("/api/v1/categories", auth.accessAuth, routes.categories);
+app.use("/api/v1/wallets", auth.accessAuth, routes.wallets);
+app.use("/api/v1/transactions", auth.accessAuth, routes.transactions);
+app.use("/api/v1/budgets", auth.accessAuth, routes.budgets);
 
 app.listen(port, () => console.log(`listening at port:${port}`));

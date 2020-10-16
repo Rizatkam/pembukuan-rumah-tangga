@@ -2,17 +2,15 @@ const Mongoose = require("mongoose");
 
 const balanceSchema = new Mongoose.Schema(
   {
-    book_id: {
+    record_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "bookrecord",
+      ref: "Record",
     },
     wallet_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "wallet",
+      ref: "Wallet",
     },
     balance: {
       type: Number,
@@ -25,6 +23,6 @@ const balanceSchema = new Mongoose.Schema(
   }
 );
 
-const balance = Mongoose.model("balance", balanceSchema);
+const Balance = Mongoose.model("Balance", balanceSchema);
 
-module.exports = balance;
+module.exports = Balance;

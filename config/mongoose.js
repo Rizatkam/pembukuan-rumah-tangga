@@ -7,6 +7,7 @@ const mongoDB = (params) => {
 
   const connect = mongoose.connect(
     `mongodb+srv://${user}:${password}@firstcluster.ijwcq.gcp.mongodb.net/${dbName}?retryWrites=true&w=majority`,
+    //mongodb+srv://wadidaw:RzLLRV6Ccqu7lvCk@firstcluster.ijwcq.gcp.mongodb.net/pembukuandb?retryWrites=true&w=majority
     {
       useCreateIndex: true,
       useNewUrlParser: true,

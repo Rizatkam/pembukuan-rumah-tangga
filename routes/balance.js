@@ -4,9 +4,9 @@ const app = express.Router();
 const { balance } = require("../controllers");
 const auth = require("../config/auth");
 
-app.get("/:bid", auth.userAuth, balance.get_by_bookID);
-app.post("/", auth.userAuth, balance.create);
-app.put("/:id", auth.userAuth, balance.update_by_id);
-app.delete("/:id", auth.userAuth, balance.delete_by_id);
+app.get("/:id", auth.userAuth, balance.gets_by_record);
+app.post("/", auth.userAuth, balance.adds);
+app.put("/:id", auth.userAuth, balance.updates);
+app.delete("/:id", auth.userAuth, balance.deletes);
 
 module.exports = app;

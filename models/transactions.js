@@ -1,27 +1,33 @@
 const Mongoose = require("mongoose");
 
-const tranSchema = new Mongoose.Schema(
+const transactionSchema = new Mongoose.Schema(
   {
-    book_id: {
+    record_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "bookrecord",
+      ref: "records",
     },
     wallet_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "wallet",
+      ref: "wallets",
     },
     category_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "category",
+      ref: "categories",
+    },
+    subcategory_id: {
+      type: String,
+      trim: true,
     },
     amount: {
       type: Number,
+      required: true,
+      trim: true,
+    },
+    note: {
+      type: String,
       trim: true,
     },
     date: {
@@ -35,6 +41,6 @@ const tranSchema = new Mongoose.Schema(
   }
 );
 
-const Transaction = Mongoose.model("transaction", tranSchema);
+const Transaction = Mongoose.model("Transaction", transactionSchema);
 
 module.exports = Transaction;

@@ -1,33 +1,37 @@
-const { balance } = require("../models");
+const { wallets, balance } = require("../models");
 
 const adds = async (req, res) => {
   try {
     const params = req.body;
 
-    const duplicated = await balance.findOne({
+    const data = await wallets.create({
       record_id: params.record_id,
-      wallet_id: params.wallet_id,
+      name: params.name,
     });
 
-    if (duplicated) {
+    if (!data) {
       return res.status(400).send({
         status: {
           code: 400,
-          message:
-            "This transaction has been inputted.Do you want to update it?",
+          message: "failed to add wallet!",
         },
       });
+    } else {
+      const dataBalance = await balance.create({
+        record_id: params.record_id,
+        wallet_id: data._id,
+        balance: params.balance,
+      });
+
+      return res.status(201).send({
+        status: {
+          code: 201,
+          message: "wallet has been inserted!",
+        },
+        data,
+        dataBalance,
+      });
     }
-
-    const data = await balance.create(params);
-
-    return res.status(201).send({
-      status: {
-        code: 201,
-        message: "balance has been inserted!",
-      },
-      data,
-    });
   } catch (err) {
     console.log(err);
     return res.status(400).send({
@@ -39,17 +43,15 @@ const adds = async (req, res) => {
   }
 };
 
-const gets_by_record = async (req, res) => {
+const gets = async (req, res) => {
   try {
-    const record_id = req.params.id;
-
-    const data = await balance.find({ record_id }).populate("wallets");
+    const data = await wallets.find({ record_id: req.params.id });
 
     if (!data) {
       return res.status(400).send({
         status: {
           code: 400,
-          message: "data not found!",
+          message: "Data not found!",
         },
       });
     }
@@ -75,31 +77,37 @@ const gets_by_record = async (req, res) => {
 const updates = async (req, res) => {
   try {
     const params = req.body;
-    const pid = req.params.id;
 
-    await balance.findByIdAndUpdate(
-      pid,
-      params,
-      { new: true },
-      (err, result) => {
-        if (err) {
-          res.status(400).send({
-            status: {
-              code: 400,
-              message: err.message,
-            },
-          });
-        } else {
-          res.status(200).send({
-            status: {
-              code: 200,
-              message: "OK",
-            },
-            data: result,
-          });
-        }
-      }
-    );
+    const data = await wallets.findOne({ _id: req.params.id });
+
+    if (!data) {
+      return res.status(400).send({
+        status: {
+          code: 400,
+          message: "data not found",
+        },
+      });
+    }
+
+    if (params.balance) {
+      const dataBalance = await balance.findOne({ wallet_id: req.params.id });
+
+      dataBalance.set({ balance: params.balance });
+      dataBalance.save();
+    }
+
+    if (params.name) {
+      data.set({ name: params.name });
+      data.save();
+    }
+
+    return res.status(200).send({
+      status: {
+        code: 200,
+        message: "OK",
+      },
+      data,
+    });
   } catch (err) {
     console.log(err);
     return res.status(400).send({
@@ -115,7 +123,7 @@ const deletes = async (req, res) => {
   try {
     const pid = req.params.id;
 
-    await balance.findByIdAndDelete(pid, (err) => {
+    await wallets.findByIdAndDelete(pid, (err) => {
       if (err) {
         res.status(400).send({
           status: {
@@ -143,9 +151,4 @@ const deletes = async (req, res) => {
   }
 };
 
-module.exports = {
-  adds,
-  gets_by_record,
-  updates,
-  deletes,
-};
+module.exports = { adds, gets, updates, deletes };

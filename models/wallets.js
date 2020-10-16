@@ -2,18 +2,15 @@ const Mongoose = require("mongoose");
 
 const walletSchema = new Mongoose.Schema(
   {
-    bookRecord: {
+    record_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "bookrecord",
+      ref: "Record",
     },
     name: {
       type: String,
       required: true,
       trim: true,
-      unique: true,
-      uppercase: true,
     },
   },
   {
@@ -21,6 +18,6 @@ const walletSchema = new Mongoose.Schema(
   }
 );
 
-const Wallet = Mongoose.model("wallet", walletSchema);
+const Wallet = Mongoose.model("Wallet", walletSchema);
 
 module.exports = Wallet;

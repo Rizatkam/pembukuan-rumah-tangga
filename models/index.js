@@ -1,23 +1,19 @@
+const clients = require("./clients");
 const users = require("./users");
-const bookRecord = require("./bookRecord");
-const category = require("./category");
-const wallet = require("./wallet");
-const transaction = require("./transaction");
+const records = require("./records");
 const balance = require("./balance");
-const budget = require("./budget");
-const categoryType = require("./categoryType");
-const currency = require("./currency");
-const parrentCategory = require("./parrentCategory");
+const categories = require("./categories");
+const wallets = require("./wallets");
+const transactions = require("./transactions");
+const budgets = require("./budgets");
 
 module.exports = {
+  clients,
   users,
-  bookRecord,
-  category,
-  wallet,
-  transaction,
+  records,
   balance,
-  budget,
-  categoryType,
-  currency,
-  parrentCategory,
+  categories,
+  wallets,
+  transactions,
+  budgets,
 };

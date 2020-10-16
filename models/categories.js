@@ -2,23 +2,24 @@ const Mongoose = require("mongoose");
 
 const categorySchema = new Mongoose.Schema(
   {
-    bookRecord: {
+    record_id: {
       type: Mongoose.Types.ObjectId,
-      required: true,
       trim: true,
-      ref: "bookrecord",
+      ref: "Record",
     },
     name: {
       type: String,
       required: true,
       trim: true,
-      unique: true,
     },
-    parrent_id: {
-      type: Mongoose.Types.ObjectId,
+    type: {
+      type: String,
       required: true,
       trim: true,
-      ref: "parrentcategory",
+    },
+    parrent_id: {
+      type: String,
+      trim: true,
     },
   },
   {
@@ -26,6 +27,6 @@ const categorySchema = new Mongoose.Schema(
   }
 );
 
-const Category = Mongoose.model("category", categorySchema);
+const Category = Mongoose.model("Category", categorySchema);
 
 module.exports = Category;
